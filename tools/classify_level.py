@@ -1,11 +1,12 @@
 """
 单级分类工具
 """
-from typing import List
+from typing import List, Optional
 from langchain.tools import BaseTool
 from pydantic import BaseModel, Field
 from utils.llm_client import LLMClient
 from prompts.classification import ClassificationPrompts
+from models.schemas import CategoryData
 from config.settings import settings
 from loguru import logger
 
@@ -25,11 +26,13 @@ class ClassifyLevelTool(BaseTool):
     args_schema: type[BaseModel] = ClassifyLevelInput
 
     llm_client: LLMClient = None
+    categories: Optional[CategoryData] = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, categories: Optional[CategoryData] = None, **kwargs):
         super().__init__(**kwargs)
         # 初始化LLM客户端（使用分类场景配置）
         self.llm_client = LLMClient.for_scenario("classification")
+        self.categories = categories
 
     def _run(
         self,
@@ -45,12 +48,13 @@ class ClassifyLevelTool(BaseTool):
         available_set = set(available_categories)
 
         for attempt in range(max_retries):
-            # 生成提示词
+            # 生成提示词（传入categories对象）
             prompt = ClassificationPrompts.create_prompt(
                 conversation=conversation,
                 available_categories=available_categories,
                 current_path=current_path,
-                level=level
+                level=level,
+                categories=self.categories
             )
 
             # 调用LLM

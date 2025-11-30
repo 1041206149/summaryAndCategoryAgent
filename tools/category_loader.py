@@ -36,10 +36,14 @@ class CategoryLoaderTool(BaseTool):
                 name = row['name']
                 parent_id = row['parent_id']
                 level = row['level']
+                description = row.get('description', '')
+                example = row.get('example', '')
 
                 if level == 1:
                     categories.level1[cat_id] = {
                         'name': name,
+                        'description': description,
+                        'example': example,
                         'children': {}
                     }
                 elif level == 2:
@@ -48,6 +52,8 @@ class CategoryLoaderTool(BaseTool):
                             l1_info['children'][name] = []
                             categories.level2[name] = {
                                 'parent': l1_info['name'],
+                                'description': description,
+                                'example': example,
                                 'children': []
                             }
                             break
@@ -56,7 +62,11 @@ class CategoryLoaderTool(BaseTool):
                         parent_row = df[df['name'] == l2_name]
                         if not parent_row.empty and parent_row['id'].iloc[0] == parent_id:
                             categories.level2[l2_name]['children'].append(name)
-                            categories.level3[name] = l2_name
+                            categories.level3[name] = {
+                                'parent': l2_name,
+                                'description': description,
+                                'example': example
+                            }
                             break
 
             logger.success(f"分类数据加载完成")

@@ -19,7 +19,7 @@ class ClassificationAgent:
             categories: 分类数据
         """
         self.categories = categories
-        self.classify_tool = ClassifyLevelTool()
+        self.classify_tool = ClassifyLevelTool(categories=categories)
         logger.debug("分类Agent初始化完成")
 
     def classify(self, cleaned_conversation: str) -> ClassificationResult:

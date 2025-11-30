@@ -72,7 +72,7 @@ class Settings(BaseModel):
     category_csv_path: str = Field(
         default_factory=lambda: os.getenv(
             "CATEGORY_CSV_PATH",
-            "data/小结分类.csv"
+            "data/categories.csv"
         )
     )
 
