@@ -35,7 +35,7 @@ class SummarizeTool(BaseTool):
         messages = [{"role": "user", "content": prompt}]
         summary = self.llm_client.chat_completion(
             messages=messages,
-            max_tokens=settings.summary_max_tokens
+            max_tokens=8192  # 默认最大token数
         )
 
         logger.debug("摘要生成完成")

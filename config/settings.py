@@ -24,7 +24,7 @@ class Settings(BaseModel):
     openai_api_base: str = Field(
         default_factory=lambda: os.getenv(
             "OPENAI_API_BASE",
-            "https://dashscope.aliyuncs.com/compatible-mode/v1"
+            "http://35.220.164.252:3888/v1"
         )
     )
 
@@ -32,38 +32,18 @@ class Settings(BaseModel):
     # 模型配置
     # ============================================
     default_model: str = Field(
-        default_factory=lambda: os.getenv("DEFAULT_MODEL", "qwen-max")
+        default_factory=lambda: os.getenv("DEFAULT_MODEL", "deepseek-chat")
+    )
+    default_temperature: float = Field(
+        default_factory=lambda: float(os.getenv("DEFAULT_TEMPERATURE", "0"))
     )
 
-    # 分类模型
-    classification_model: str = Field(
-        default_factory=lambda: os.getenv("CLASSIFICATION_MODEL", "qwen-max")
+    # Agent 模型
+    agent_model: str = Field(
+        default_factory=lambda: os.getenv("AGENT_MODEL", "deepseek-chat")
     )
-    classification_temperature: float = Field(
-        default_factory=lambda: float(os.getenv("CLASSIFICATION_TEMPERATURE", "0.01"))
-    )
-    classification_top_p: float = Field(
-        default_factory=lambda: float(os.getenv("CLASSIFICATION_TOP_P", "0.8"))
-    )
-    classification_max_tokens: int = Field(
-        default_factory=lambda: int(os.getenv("CLASSIFICATION_MAX_TOKENS", "8192"))
-    )
-    classification_max_retries: int = Field(
-        default_factory=lambda: int(os.getenv("CLASSIFICATION_MAX_RETRIES", "3"))
-    )
-
-    # 摘要模型
-    summary_model: str = Field(
-        default_factory=lambda: os.getenv("SUMMARY_MODEL", "qwen-max")
-    )
-    summary_temperature: float = Field(
-        default_factory=lambda: float(os.getenv("SUMMARY_TEMPERATURE", "0.01"))
-    )
-    summary_top_p: float = Field(
-        default_factory=lambda: float(os.getenv("SUMMARY_TOP_P", "0.8"))
-    )
-    summary_max_tokens: int = Field(
-        default_factory=lambda: int(os.getenv("SUMMARY_MAX_TOKENS", "8192"))
+    agent_temperature: float = Field(
+        default_factory=lambda: float(os.getenv("AGENT_TEMPERATURE", "0"))
     )
 
     # ============================================
@@ -84,6 +64,22 @@ class Settings(BaseModel):
     )
     api_port: int = Field(
         default_factory=lambda: int(os.getenv("API_PORT", "8008"))
+    )
+
+    # ============================================
+    # LangChain 配置
+    # ============================================
+    langchain_tracing_v2: bool = Field(
+        default_factory=lambda: os.getenv("LANGCHAIN_TRACING_V2", "false").lower() == "true"
+    )
+    langchain_endpoint: str = Field(
+        default_factory=lambda: os.getenv("LANGCHAIN_ENDPOINT", "https://api.smith.langchain.com")
+    )
+    langchain_api_key: str = Field(
+        default_factory=lambda: os.getenv("LANGCHAIN_API_KEY", "")
+    )
+    langchain_project: str = Field(
+        default_factory=lambda: os.getenv("LANGCHAIN_PROJECT", "summaryAndCategory")
     )
 
     # ============================================

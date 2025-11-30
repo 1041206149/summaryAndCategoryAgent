@@ -158,15 +158,15 @@ class LLMClient:
         scenario_configs = {
             "default": {
                 "model": settings.default_model,
-                "temperature": 0.3
+                "temperature": settings.default_temperature
             },
             "classification": {
-                "model": settings.classification_model,
-                "temperature": settings.classification_temperature
+                "model": settings.agent_model,
+                "temperature": settings.agent_temperature
             },
             "summary": {
-                "model": settings.summary_model,
-                "temperature": settings.summary_temperature
+                "model": settings.agent_model,
+                "temperature": settings.agent_temperature
             }
         }
 

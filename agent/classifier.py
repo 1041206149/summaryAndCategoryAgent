@@ -1,15 +1,15 @@
 """
 分类Agent
-负责执行三级分类逻辑
+负责执行三级分类逻辑（支持多轮对话记忆）
 """
-from typing import List
+from typing import List, Dict
 from loguru import logger
 from tools.classify_level import ClassifyLevelTool
 from models.schemas import CategoryData, ClassificationResult
 
 
 class ClassificationAgent:
-    """分类Agent"""
+    """分类Agent（带对话历史记忆）"""
 
     def __init__(self, categories: CategoryData):
         """
@@ -24,7 +24,7 @@ class ClassificationAgent:
 
     def classify(self, cleaned_conversation: str) -> ClassificationResult:
         """
-        执行三级分类
+        执行三级分类（多轮对话模式）
 
         Args:
             cleaned_conversation: 清洗后的对话
@@ -32,46 +32,53 @@ class ClassificationAgent:
         Returns:
             分类结果
         """
-        logger.info("开始分层分类...")
+        logger.info("开始分层分类（多轮对话模式）...")
         classification_path = []
+        chat_history = []  # 初始化对话历史
 
         # 一级分类
         level1_categories = self._get_level1_categories()
         logger.debug(f"一级分类选项: {level1_categories}")
-        level1 = self.classify_tool._run(
+        level1, chat_history = self.classify_tool._run(
             conversation=cleaned_conversation,
             available_categories=level1_categories,
             current_path=[],
-            level=1
+            level=1,
+            chat_history=chat_history
         )
         classification_path.append(level1)
         logger.info(f"一级分类: {level1}")
+        logger.debug(f"对话历史长度: {len(chat_history)}")
 
-        # 二级分类
+        # 二级分类（携带一级分类的历史）
         level2_categories = self._get_level2_categories(level1)
         logger.debug(f"二级分类选项: {level2_categories}")
-        level2 = self.classify_tool._run(
+        level2, chat_history = self.classify_tool._run(
             conversation=cleaned_conversation,
             available_categories=level2_categories,
             current_path=classification_path,
-            level=2
+            level=2,
+            chat_history=chat_history  # 传入历史
         )
         classification_path.append(level2)
         logger.info(f"二级分类: {level2}")
+        logger.debug(f"对话历史长度: {len(chat_history)}")
 
-        # 三级分类 (如果需要)
+        # 三级分类 (如果需要，携带一二级分类的历史)
         level3 = None
         if level2 in self.categories.level3_parents:
             level3_categories = self._get_level3_categories(level2)
             logger.debug(f"三级分类选项: {level3_categories}")
-            level3 = self.classify_tool._run(
+            level3, chat_history = self.classify_tool._run(
                 conversation=cleaned_conversation,
                 available_categories=level3_categories,
                 current_path=classification_path,
-                level=3
+                level=3,
+                chat_history=chat_history  # 传入历史
             )
             classification_path.append(level3)
             logger.info(f"三级分类: {level3}")
+            logger.debug(f"对话历史长度: {len(chat_history)}")
 
         logger.success(f"分类完成: {classification_path}")
 

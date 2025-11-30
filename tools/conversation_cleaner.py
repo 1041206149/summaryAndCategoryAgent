@@ -48,6 +48,7 @@ class ConversationCleanerTool(BaseTool):
     ]
 
     def _run(self, conversation: str) -> str:
+        pass
         """执行清洗"""
         if pd.isna(conversation) or not isinstance(conversation, str):
             return ""
